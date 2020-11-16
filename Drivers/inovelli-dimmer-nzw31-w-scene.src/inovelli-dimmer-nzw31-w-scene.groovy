@@ -376,7 +376,7 @@ def initialize() {
     try {
         addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep8",
                 [completedSetup: true, label: "${device.displayName} (Default Local Level)",
-                isComponent: true, componentName: "ep8", componentLabel: "Default Local Level"])
+                isComponent: false, componentName: "ep8", componentLabel: "Default Local Level"])
     } catch (e) {
         runIn(3, "sendAlert", [data: [message: "Child device creation failed. Make sure the device handler for \"Switch Level Child Device\" is installed"]])
     }
@@ -386,7 +386,7 @@ def initialize() {
         def childDevice = children.find{it.deviceNetworkId.endsWith("ep8")}
         try {
             if (logEnable) log.debug "Hubitat has issues trying to delete the child device when it is in use. Need to manually delete them."
-            //if(childDevice) deleteChildDevice(childDevice.deviceNetworkId)
+            if(childDevice) deleteChildDevice(childDevice.deviceNetworkId)
         } catch (e) {
             runIn(3, "sendAlert", [data: [message: "Failed to delete child device. Make sure the device is not in use by any SmartApp."]])
         }
@@ -395,7 +395,7 @@ def initialize() {
     try {
         addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep9",
                 [completedSetup: true, label: "${device.displayName} (Default Z-Wave Level)",
-                isComponent: true, componentName: "ep9", componentLabel: "Default Z-Wave Level"])
+                isComponent: false, componentName: "ep9", componentLabel: "Default Z-Wave Level"])
     } catch (e) {
         runIn(3, "sendAlert", [data: [message: "Child device creation failed. Make sure the device handler for \"Switch Level Child Device\" is installed"]])
     }
@@ -405,16 +405,16 @@ def initialize() {
         def childDevice = children.find{it.deviceNetworkId.endsWith("ep9")}
         try {
             if (logEnable) log.debug "Hubitat has issues trying to delete the child device when it is in use. Need to manually delete them."
-            //if(childDevice) deleteChildDevice(childDevice.deviceNetworkId)
+            if(childDevice) deleteChildDevice(childDevice.deviceNetworkId)
         } catch (e) {
             runIn(3, "sendAlert", [data: [message: "Failed to delete child device. Make sure the device is not in use by any SmartApp."]])
         }
     }
     if (enableDisableLocalChild && !childExists("ep101")) {
     try {
-        addChildDevice("hubitat", "Generic Component Switch", "${device.deviceNetworkId}-ep101",
+        addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep101",
                 [completedSetup: true, label: "${device.displayName} (Disable Local Control)",
-                isComponent: true, componentName: "ep101", componentLabel: "Disable Local Control"])
+                isComponent: false, componentName: "ep101", componentLabel: "Disable Local Control"])
     } catch (e) {
         runIn(3, "sendAlert", [data: [message: "Child device creation failed. Make sure the device handler for \"Switch Level Child Device\" is installed"]])
     }
@@ -424,7 +424,7 @@ def initialize() {
         def childDevice = children.find{it.deviceNetworkId.endsWith("ep101")}
         try {
             if (logEnable) log.debug "Hubitat has issues trying to delete the child device when it is in use. Need to manually delete them."
-            //if(childDevice) deleteChildDevice(childDevice.deviceNetworkId)
+            if(childDevice) deleteChildDevice(childDevice.deviceNetworkId)
         } catch (e) {
             runIn(3, "sendAlert", [data: [message: "Failed to delete child device. Make sure the device is not in use by any SmartApp."]])
         }
@@ -878,6 +878,3 @@ def zwaveEvent(hubitat.zwave.commands.protectionv2.ProtectionReport cmd) {
         childDevice.sendEvent(name: "switch", value: integerValue > 0 ? "on" : "off")        
     }
 }
-
-
-
