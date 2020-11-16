@@ -333,7 +333,7 @@ def initialize() {
     sendEvent(name: "numberOfButtons", value: 6, displayed: true)
     if (enableDisableLocalChild && !childExists("ep101")) {
     try {
-        addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep101",
+        addChildDevice("hubitat", "Generic Component Switch", "${device.deviceNetworkId}-ep101",
                 [completedSetup: true, label: "${device.displayName} (Disable Local Control)",
                 isComponent: true, componentName: "ep101", componentLabel: "Disable Local Control"])
     } catch (e) {

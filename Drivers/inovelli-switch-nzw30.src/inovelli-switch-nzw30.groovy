@@ -149,7 +149,7 @@ def initialize() {
     sendEvent(name: "checkInterval", value: 3 * 60 * 60 + 2 * 60, displayed: false, data: [protocol: "zwave", hubHardwareId: device.hub.hardwareID, offlinePingable: "1"])
     if (enableDisableLocalChild && !childExists("ep101")) {
         try {
-            addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep101",
+            addChildDevice("hubitat", "Generic Component Switch", "${device.deviceNetworkId}-ep101",
                     [completedSetup: true, label: "${device.displayName} (Disable Local Control)",
                     isComponent: true, componentName: "ep101", componentLabel: "Disable Local Control"])
         } catch (e) {

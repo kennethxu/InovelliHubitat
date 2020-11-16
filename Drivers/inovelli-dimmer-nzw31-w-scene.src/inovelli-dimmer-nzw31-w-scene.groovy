@@ -90,7 +90,7 @@ metadata {
         command "childOff"
         command "childRefresh"
         command "childSetLevel"
-	command "componentOn"
+        command "componentOn"
         command "componentOff"
         command "componentSetLevel"
         command "componentRefresh"
@@ -412,7 +412,7 @@ def initialize() {
     }
     if (enableDisableLocalChild && !childExists("ep101")) {
     try {
-        addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep101",
+        addChildDevice("hubitat", "Generic Component Switch", "${device.deviceNetworkId}-ep101",
                 [completedSetup: true, label: "${device.displayName} (Disable Local Control)",
                 isComponent: true, componentName: "ep101", componentLabel: "Disable Local Control"])
     } catch (e) {
