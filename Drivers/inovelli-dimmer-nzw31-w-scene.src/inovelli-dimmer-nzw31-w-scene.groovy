@@ -86,15 +86,10 @@ metadata {
                                         [name: "Action*", type:"ENUM", constraints: ["Add", "Remove"]],
                                         [name:"Multi-channel Endpoint", type:"NUMBER", description: "Currently not implemented"]] 
 
-        command "childOn"
-        command "childOff"
-        command "childRefresh"
-        command "childSetLevel"
         command "componentOn"
         command "componentOff"
         command "componentSetLevel"
         command "componentRefresh"
-
 
         fingerprint mfr: "015D", prod: "B111", model: "251C", deviceJoinName: "Inovelli Dimmer"
         fingerprint mfr: "051D", prod: "B111", model: "251C", deviceJoinName: "Inovelli Dimmer"
@@ -107,9 +102,6 @@ metadata {
 
     }
 
-    simulator {
-    }
-    
     preferences {
         def maxGroups
         input "minimumLevel", "number", title: "Minimum Level\n\nMinimum dimming level for attached light\nRange: 1 to 99", description: "Tap to set", required: false, range: "1..99", defaultValue: "1"
@@ -151,96 +143,7 @@ metadata {
 	    input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
 
     }
-    
-    tiles {
-        multiAttributeTile(name: "switch", type: "lighting", width: 6, height: 4, canChangeIcon: true) {
-            tileAttribute("device.switch", key: "PRIMARY_CONTROL") {
-                attributeState "off", label: '${name}', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff", nextState: "turningOn"
-                attributeState "on", label: '${name}', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#00a0dc", nextState: "turningOff"
-                attributeState "turningOff", label: '${name}', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff", nextState: "turningOn"
-                attributeState "turningOn", label: '${name}', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#00a0dc", nextState: "turningOff"
-            }
-            tileAttribute ("device.level", key: "SLIDER_CONTROL") {
-                attributeState "level", action:"switch level.setLevel"
-            }
-            tileAttribute("device.lastEvent", key: "SECONDARY_CONTROL") {
-                attributeState("default", label:'${currentValue}',icon: "st.unknown.zwave.remote-controller")
-            }
-        }
-        
-        valueTile("lastActivity", "device.lastActivity", inactiveLabel: false, decoration: "flat", width: 4, height: 1) {
-            state "default", label: 'Last Activity: ${currentValue}',icon: "st.Health & Wellness.health9"
-        }
-        
-        valueTile("firmware", "device.firmware", inactiveLabel: false, decoration: "flat", width: 2, height: 1) {
-            state "default", label: 'fw: ${currentValue}', icon: ""
-        }
-        
-        valueTile("info", "device.info", inactiveLabel: false, decoration: "flat", width: 3, height: 1) {
-            state "default", label: 'Tap on the buttons below to test scenes (ie: Tap ▲ 1x, ▲▲ 2x, etc depending on the button)'
-        }
-        
-        valueTile("icon", "device.icon", inactiveLabel: false, decoration: "flat", width: 2, height: 1) {
-            state "default", label: '', icon: "https://inovelli.com/wp-content/uploads/Device-Handler/Inovelli-Device-Handler-Logo.png"
-        }
-        
-        standardTile("refresh", "device.switch", inactiveLabel: false, decoration: "flat", width: 1, height: 1) {
-            state "default", label: "", action: "refresh.refresh", icon: "st.secondary.refresh"
-        }
-        
-        standardTile("pressUpX1", "device.pressUpX1", width: 2, height: 1, decoration: "flat") {
-            state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "pressUpX1"
-        }
-        
-        standardTile("pressUpX2", "device.pressUpX2", width: 2, height: 1, decoration: "flat") {
-            state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "pressUpX2"
-        }
-        
-        standardTile("pressUpX3", "device.pressUpX3", width: 2, height: 1, decoration: "flat") {
-            state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "pressUpX3"
-        }
-        
-        standardTile("pressDownX1", "device.pressDownX1", width: 2, height: 1, decoration: "flat") {
-            state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "pressDownX1"
-        }
-        
-        standardTile("pressDownX2", "device.pressDownX2", width: 2, height: 1, decoration: "flat") {
-            state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "pressDownX2"
-        }
-        
-        standardTile("pressDownX3", "device.pressDownX3", width: 2, height: 1, decoration: "flat") {
-            state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "pressDownX3"
-        }
-        
-        standardTile("pressUpX4", "device.pressUpX4", width: 2, height: 1, decoration: "flat") {
-            state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "pressUpX4"
-        }
-        
-        standardTile("pressUpX5", "device.pressUpX5", width: 2, height: 1, decoration: "flat") {
-            state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "pressUpX5"
-        }
-        
-        standardTile("holdUp", "device.holdUp", width: 2, height: 1, decoration: "flat") {
-			state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "holdUp"
-		}
-        
-        standardTile("pressDownX4", "device.pressDownX4", width: 2, height: 1, decoration: "flat") {
-            state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "pressDownX4"
-        }
-        
-        standardTile("pressDownX5", "device.pressDownX5", width: 2, height: 1, decoration: "flat") {
-            state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "pressDownX5"
-        }
-        
-        standardTile("holdDown", "device.holdDown", width: 2, height: 1, decoration: "flat") {
-			state "default", label: '${currentValue}', backgroundColor: "#ffffff", action: "holdDown"
-		}
-        
-    }
-}
 
-private channelNumber(String dni) {
-    dni.split("-ep")[-1] as Integer
 }
 
 private sendAlert(data) {
@@ -253,54 +156,61 @@ private sendAlert(data) {
     )
 }
 
-def childSetLevel(String dni, value) {
-    def valueaux = value as Integer
-    def level = Math.max(Math.min(valueaux, 99), 0)    
+private initChildDevice(id, enabled, label, driver, namespace = "hubitat", isComponent = false){
+    def childDevice = childDevices.find{it.deviceNetworkId.endsWith(id)}
+    if(enabled) {
+        if(!childDevice) {
+            try {
+                def newChild = addChildDevice(namespace, driver, "${device.deviceNetworkId}-${id}",
+                    [completedSetup: true, label: "${device.displayName} (${label})",
+                    isComponent: isComponent, componentName: id, componentLabel: label])
+                newChild.sendEvent(name:"switch", value:"off")
+            } catch (e) {
+                runIn(3, "sendAlert", [data: [message: "Child device creation failed. Make sure the driver for \"${driver}\" with a namespace of ${namespace} is installed"]])
+            }
+        } else if (device.label != state.oldLabel) {
+             childDevice.setLabel("${device.displayName} (${label})")
+        }
+    } else if (childDevice) {
+        try {
+            deleteChildDevice(childDevice.deviceNetworkId)
+        } catch (e) {
+            if (infoEnable) log.info "Hubitat may have issues trying to delete the child device when it is in use. Need to manually delete them."
+            runIn(3, "sendAlert", [data: [message: "Failed to delete child device. Make sure the device is not in use by any App."]])
+        }
+    }
+}
+
+def componentSetLevel(cd,level,transitionTime = null) {
+    if (infoEnable) log.info "${device.label?device.label:device.name}: componentSetLevel($cd, $value)"
+    int channel = cd.deviceNetworkId.split("-ep")[-1] as Integer
+    int value = Math.max(Math.min(level as Integer, 99), 0)
     def cmds = []
-    switch (channelNumber(dni)) {
+    switch (channel) {
         case 8:
-            cmds << new hubitat.device.HubAction(command(zwave.configurationV1.configurationSet(scaledConfigurationValue: value, parameterNumber: channelNumber(dni), size: 1) ), hubitat.device.Protocol.ZWAVE)
-            cmds << new hubitat.device.HubAction(command(zwave.configurationV1.configurationGet(parameterNumber: channelNumber(dni) )), hubitat.device.Protocol.ZWAVE)
+            cmds << new hubitat.device.HubAction(command(zwave.configurationV1.configurationSet(scaledConfigurationValue: value, parameterNumber: channel, size: 1) ), hubitat.device.Protocol.ZWAVE)
+            cmds << new hubitat.device.HubAction(command(zwave.configurationV1.configurationGet(parameterNumber: channel)), hubitat.device.Protocol.ZWAVE)
         break
         case 9:
-            cmds << new hubitat.device.HubAction(command(zwave.configurationV1.configurationSet(scaledConfigurationValue: value, parameterNumber: channelNumber(dni), size: 1) ), hubitat.device.Protocol.ZWAVE)
-            cmds << new hubitat.device.HubAction(command(zwave.configurationV1.configurationGet(parameterNumber: channelNumber(dni) )), hubitat.device.Protocol.ZWAVE)
+            cmds << new hubitat.device.HubAction(command(zwave.configurationV1.configurationSet(scaledConfigurationValue: value, parameterNumber: channel, size: 1) ), hubitat.device.Protocol.ZWAVE)
+            cmds << new hubitat.device.HubAction(command(zwave.configurationV1.configurationGet(parameterNumber: channel)), hubitat.device.Protocol.ZWAVE)
         break
         case 101:
-            cmds << new hubitat.device.HubAction(command(zwave.protectionV2.protectionSet(localProtectionState : level > 0 ? 2 : 0, rfProtectionState: 0) ), hubitat.device.Protocol.ZWAVE)
+            cmds << new hubitat.device.HubAction(command(zwave.protectionV2.protectionSet(localProtectionState : value > 0 ? 2 : 0, rfProtectionState: 0) ), hubitat.device.Protocol.ZWAVE)
             cmds << new hubitat.device.HubAction(command(zwave.protectionV2.protectionGet() ), hubitat.device.Protocol.ZWAVE)
         break
     }
 	cmds
 }
 
-def childOn(String dni) {
-    if (logEnable) log.debug "childOn($dni)"
-    childSetLevel(dni, 99)
-}
-
-def childOff(String dni) {
-    if (logEnable) log.debug "childOff($dni)"
-    childSetLevel(dni, 0)
-}
-
-def childRefresh(String dni) {
-    if (logEnable) log.debug "childRefresh($dni)"
-}
-
-def componentSetLevel(cd,level,transitionTime = null) {
-    if (infoEnable) log.info "${device.label?device.label:device.name}: componentSetLevel($cd, $value)"
-	return childSetLevel(cd.deviceNetworkId,level)
-}
-
 def componentOn(cd) {
     if (infoEnable) log.info "${device.label?device.label:device.name}: componentOn($cd)"
-    return childOn(cd.deviceNetworkId)
+    return componentSetLevel(cd, 99)
 }
 
 def componentOff(cd) {
     if (infoEnable) log.info "${device.label?device.label:device.name}: componentOff($cd)"
-    return childOff(cd.deviceNetworkId)
+    return componentSetLevel(cd, 0)
 }
 
 void componentRefresh(cd) {
@@ -371,77 +281,12 @@ def integer2Cmd(value, size) {
 def initialize() {
     sendEvent(name: "checkInterval", value: 3 * 60 * 60 + 2 * 60, displayed: false, data: [protocol: "zwave", hubHardwareId: device.hub.hardwareID, offlinePingable: "1"])
     sendEvent(name: "numberOfButtons", value: 6, displayed: true)
-    
-    if (enableDefaultLocalChild && !childExists("ep8")) {
-    try {
-        addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep8",
-                [completedSetup: true, label: "${device.displayName} (Default Local Level)",
-                isComponent: false, componentName: "ep8", componentLabel: "Default Local Level"])
-    } catch (e) {
-        runIn(3, "sendAlert", [data: [message: "Child device creation failed. Make sure the device handler for \"Switch Level Child Device\" is installed"]])
-    }
-    } else if (!enableDefaultLocalChild && childExists("ep8")) {
-        if (logEnable) log.debug "Trying to delete child device ep8. If this fails it is likely that there is a SmartApp using the child device in question."
-        def children = childDevices
-        def childDevice = children.find{it.deviceNetworkId.endsWith("ep8")}
-        try {
-            if (logEnable) log.debug "Hubitat has issues trying to delete the child device when it is in use. Need to manually delete them."
-            if(childDevice) deleteChildDevice(childDevice.deviceNetworkId)
-        } catch (e) {
-            runIn(3, "sendAlert", [data: [message: "Failed to delete child device. Make sure the device is not in use by any SmartApp."]])
-        }
-    }
-    if (enableDefaultZWaveChild && !childExists("ep9")) {
-    try {
-        addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep9",
-                [completedSetup: true, label: "${device.displayName} (Default Z-Wave Level)",
-                isComponent: false, componentName: "ep9", componentLabel: "Default Z-Wave Level"])
-    } catch (e) {
-        runIn(3, "sendAlert", [data: [message: "Child device creation failed. Make sure the device handler for \"Switch Level Child Device\" is installed"]])
-    }
-    } else if (!enableDefaultLocalChild && childExists("ep9")) {
-        if (logEnable) log.debug "Trying to delete child device ep9. If this fails it is likely that there is a SmartApp using the child device in question."
-        def children = childDevices
-        def childDevice = children.find{it.deviceNetworkId.endsWith("ep9")}
-        try {
-            if (logEnable) log.debug "Hubitat has issues trying to delete the child device when it is in use. Need to manually delete them."
-            if(childDevice) deleteChildDevice(childDevice.deviceNetworkId)
-        } catch (e) {
-            runIn(3, "sendAlert", [data: [message: "Failed to delete child device. Make sure the device is not in use by any SmartApp."]])
-        }
-    }
-    if (enableDisableLocalChild && !childExists("ep101")) {
-    try {
-        addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep101",
-                [completedSetup: true, label: "${device.displayName} (Disable Local Control)",
-                isComponent: false, componentName: "ep101", componentLabel: "Disable Local Control"])
-    } catch (e) {
-        runIn(3, "sendAlert", [data: [message: "Child device creation failed. Make sure the device handler for \"Switch Level Child Device\" is installed"]])
-    }
-    } else if (!enableDisableLocalChild && childExists("ep101")) {
-        if (logEnable) log.debug "Trying to delete child device ep101. If this fails it is likely that there is a SmartApp using the child device in question."
-        def children = childDevices
-        def childDevice = children.find{it.deviceNetworkId.endsWith("ep101")}
-        try {
-            if (logEnable) log.debug "Hubitat has issues trying to delete the child device when it is in use. Need to manually delete them."
-            if(childDevice) deleteChildDevice(childDevice.deviceNetworkId)
-        } catch (e) {
-            runIn(3, "sendAlert", [data: [message: "Failed to delete child device. Make sure the device is not in use by any SmartApp."]])
-        }
-    }
-    if (device.label != state.oldLabel) {
-        def children = childDevices
-        def childDevice = children.find{it.deviceNetworkId.endsWith("ep8")}
-        if (childDevice)
-        childDevice.setLabel("${device.displayName} (Default Local Level)")
-        childDevice = children.find{it.deviceNetworkId.endsWith("ep9")}
-        if (childDevice)
-        childDevice.setLabel("${device.displayName} (Default Z-Wave Level)")
-        childDevice = children.find{it.deviceNetworkId.endsWith("ep101")}
-        if (childDevice)
-        childDevice.setLabel("${device.displayName} (Disable Local Control)")
-        state.oldLabel = device.label
-    }
+
+    initChildDevice("ep8", enableDefaultLocalChild, "Default Local Level", "Generic Component Dimmer")
+    initChildDevice("ep9", enableDefaultZWaveChild, "Default Z-Wave Level", "Generic Component Dimmer")
+    initChildDevice("ep101", enableDisableLocalChild, "Disable Local Control", "Generic Component Switch")
+
+    state.oldLabel = device.label
 
     sendEvent([name:"pressUpX1", value:pressUpX1Label? "${pressUpX1Label} ▲" : "Tap ▲", displayed: false])
     sendEvent([name:"pressDownX1", value:pressDownX1Label? "${pressDownX1Label} ▼" : "Tap ▼", displayed: false])
