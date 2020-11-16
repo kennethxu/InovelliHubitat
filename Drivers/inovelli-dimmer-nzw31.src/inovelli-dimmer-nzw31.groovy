@@ -14,6 +14,8 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
+ *  2020-11-15: Switch over to using Hubitat child device drivers - Kenneth Xu
+ *
  *  2019-11-20: Fixed Association Group management.
  *              Added upgraded NZW31 fingerpint.
  *
@@ -72,6 +74,10 @@ metadata {
         command "childOff"
         command "childRefresh"
         command "childSetLevel"
+        command "componentOn"
+        command "componentOff"
+        command "componentSetLevel"
+        command "componentRefresh"
 
         fingerprint mfr: "0312", prod: "0118", model: "1E1C", deviceJoinName: "Inovelli Dimmer"
         fingerprint mfr: "015D", prod: "0118", model: "1E1C", deviceJoinName: "Inovelli Dimmer"
@@ -198,7 +204,7 @@ def initialize() {
     sendEvent(name: "checkInterval", value: 3 * 60 * 60 + 2 * 60, displayed: false, data: [protocol: "zwave", hubHardwareId: device.hub.hardwareID, offlinePingable: "1"])
     if (enableDefaultLocalChild && !childExists("ep8")) {
     try {
-        addChildDevice("Switch Level Child Device", "${device.deviceNetworkId}-ep8",
+        addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep8",
                 [completedSetup: true, label: "${device.displayName} (Default Local Level)",
                 isComponent: true, componentName: "ep8", componentLabel: "Default Local Level"])
     } catch (e) {
@@ -217,7 +223,7 @@ def initialize() {
     }
     if (enableDefaultZWaveChild && !childExists("ep9")) {
     try {
-        addChildDevice("Switch Level Child Device", "${device.deviceNetworkId}-ep9",
+        addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep9",
                 [completedSetup: true, label: "${device.displayName} (Default Z-Wave Level)",
                 isComponent: true, componentName: "ep9", componentLabel: "Default Z-Wave Level"])
     } catch (e) {
@@ -236,7 +242,7 @@ def initialize() {
     }
     if (enableDisableLocalChild && !childExists("ep101")) {
     try {
-        addChildDevice("Switch Level Child Device", "${device.deviceNetworkId}-ep101",
+        addChildDevice("hubitat", "Generic Component Dimmer", "${device.deviceNetworkId}-ep101",
                 [completedSetup: true, label: "${device.displayName} (Disable Local Control)",
                 isComponent: true, componentName: "ep101", componentLabel: "Disable Local Control"])
     } catch (e) {
@@ -489,6 +495,25 @@ def childSetLevel(String dni, value) {
         break
     }
 	cmds
+}
+
+def componentSetLevel(cd,level,transitionTime = null) {
+    if (infoEnable) log.info "${device.label?device.label:device.name}: componentSetLevel($cd, $value)"
+        return childSetLevel(cd.deviceNetworkId,level)
+}
+
+def componentOn(cd) {
+    if (infoEnable) log.info "${device.label?device.label:device.name}: componentOn($cd)"
+    return childOn(cd.deviceNetworkId)
+}
+
+def componentOff(cd) {
+    if (infoEnable) log.info "${device.label?device.label:device.name}: componentOff($cd)"
+    return childOff(cd.deviceNetworkId)
+}
+
+void componentRefresh(cd) {
+    if (infoEnable) log.info "${device.label?device.label:device.name}: componentRefresh($cd)"
 }
 
 def cmd2Integer(array) {
